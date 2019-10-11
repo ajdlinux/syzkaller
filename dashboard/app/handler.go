@@ -1,13 +1,14 @@
 // Copyright 2017 syzkaller project authors. All rights reserved.
 // Use of this source code is governed by Apache 2 LICENSE that can be found in the LICENSE file.
 
-package dash
+package main
 
 import (
 	"bytes"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"html/template"
 	"net/http"
 	"sort"
 	"strings"
@@ -232,4 +233,10 @@ func encodeCookie(w http.ResponseWriter, cd *cookieData) {
 	http.SetCookie(w, cookie)
 }
 
-var templates = html.CreateGlob("*.html")
+// TODO: This is gross and disgusting
+var templates = func() *template.Template {
+	if appengine.IsAppEngine() || appengine.IsDevAppServer() {
+		return html.CreateGlob("dashboard/app/*.html")
+	}
+	return html.CreateGlob("*.html")
+}()

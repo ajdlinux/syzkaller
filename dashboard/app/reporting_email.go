@@ -1,7 +1,7 @@
 // Copyright 2017 syzkaller project authors. All rights reserved.
 // Use of this source code is governed by Apache 2 LICENSE that can be found in the LICENSE file.
 
-package dash
+package main
 
 import (
 	"bytes"
@@ -13,6 +13,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"text/template"
 	"time"
 
 	"github.com/google/syzkaller/dashboard/dashapi"
@@ -552,4 +553,10 @@ func appURL(c context.Context) string {
 	return fmt.Sprintf("https://%v.appspot.com", appengine.AppID(c))
 }
 
-var mailTemplates = html.CreateTextGlob("mail_*.txt")
+// TODO: This is gross and disgusting
+var mailTemplates = func() *template.Template {
+	if appengine.IsAppEngine() || appengine.IsDevAppServer() {
+		return html.CreateTextGlob("dashboard/app/mail_*.txt")
+	}
+	return html.CreateTextGlob("mail_*.txt")
+}()
