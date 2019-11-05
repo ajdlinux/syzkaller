@@ -1,6 +1,6 @@
 {
 	"ImportPath": "github.com/google/syzkaller",
-	"GoVersion": "go1.8",
+	"GoVersion": "go1.11",
 	"GodepVersion": "v80",
 	"Packages": [
 		"./..."
