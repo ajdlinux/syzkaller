@@ -342,7 +342,7 @@ install_prerequisites:
 	sudo apt-get install -y -q g++-arm-linux-gnueabi || true
 	sudo apt-get install -y -q g++-mips64el-linux-gnuabi64 || true
 	sudo apt-get install -y -q ragel clang-format
-	go get -u golang.org/x/tools/cmd/goyacc \
+	GO111MODULE=off go get -u golang.org/x/tools/cmd/goyacc \
 		github.com/golangci/golangci-lint/cmd/golangci-lint \
 		github.com/dvyukov/go-fuzz/go-fuzz-build
 
