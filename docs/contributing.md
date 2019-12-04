@@ -49,16 +49,10 @@ so that there is agreement on high level approach and no duplication of work bet
 ## Go
 
 `syzkaller` is written in [Go](https://golang.org), and a `Go 1.11` or `Go 1.12`
-toolchain is required for build. The toolchain can be installed with:
+toolchain is required for build.
 
-```
-go get golang.org/dl/go1.12
-go1.12 download
-# Default download path is here.
-~/sdk/go1.12/bin/go version
-export GOROOT=$HOME/sdk/go1.12
-export PATH=$HOME/sdk/go1.12/bin:$PATH
-```
+See the [Go Getting Started guide](https://golang.org/doc/install) for
+information about installing Go.
 
 Then get and build `syzkaller`:
 
@@ -76,7 +70,7 @@ or `make format`, you may be using Go 1.10 or older. In such case update to Go 1
 ## How to create a pull request
 
 - First, you need an own git fork of syzkaller repository. Nagivate to [github.com/google/syzkaller](https://github.com/google/syzkaller) and press `Fork` button in the top-right corner of the page. This will create `https://github.com/YOUR_GITHUB_USERNAME/syzkaller` repository.
-- Checkout main syzkaller repository if you have not already. To work with `go` command the checkout must be under `$GOPATH`. The simplest way to do it is to run `go get github.com/google/syzkaller`, this will checkout the repository in `$GOPATH/src/github.com/google/syzkaller`.
+- Checkout main syzkaller repository if you have not already. The simplest way to do it is to run `go get github.com/google/syzkaller`, this will checkout the repository in `$GOPATH/src/github.com/google/syzkaller`.
 - Remember to `export PATH=$GOPATH/bin:$PATH` if you have not already.
 - Then add your repository as an additional origin:
 
