@@ -24,6 +24,7 @@ import (
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/compute/v0.beta"
 	"google.golang.org/api/googleapi"
+	"google.golang.org/api/option"
 )
 
 type Context struct {
@@ -53,7 +54,8 @@ func NewContext() (*Context, error) {
 		return nil, fmt.Errorf("failed to get a token source: %v", err)
 	}
 	httpClient := oauth2.NewClient(background, tokenSource)
-	ctx.computeService, _ = compute.New(httpClient)
+	ctx.computeService, _ = compute.NewService(background,
+		option.WithHTTPClient(httpClient))
 	// Obtain project name, zone and current instance IP address.
 	ctx.ProjectID, err = ctx.getMeta("project/project-id")
 	if err != nil {
