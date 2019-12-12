@@ -16,7 +16,7 @@ import (
 
 type fuchsia struct{}
 
-// syzRoot returns $GOPATH/src/github.com/google/syzkaller.
+// syzRoot returns the root of the syzkaller repository
 func syzRoot() (string, error) {
 	_, selfPath, _, ok := runtime.Caller(0)
 	if !ok {
