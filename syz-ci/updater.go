@@ -37,7 +37,6 @@ type SyzUpdater struct {
 	repoAddress   string
 	branch        string
 	descriptions  string
-	gopathDir     string
 	syzkallerDir  string
 	latestDir     string
 	currentDir    string
@@ -63,8 +62,7 @@ func NewSyzUpdater(cfg *Config) *SyzUpdater {
 		log.Fatalf("%v executable must be in cwd (it will be overwritten on update)", exe)
 	}
 
-	gopath := filepath.Join(wd, "gopath")
-	syzkallerDir := filepath.Join(gopath, "src", "github.com", "google", "syzkaller")
+	syzkallerDir := filepath.Join(wd, "syzkaller-src")
 	osutil.MkdirAll(syzkallerDir)
 
 	// List of required files in syzkaller build (contents of latest/current dirs).
@@ -96,7 +94,6 @@ func NewSyzUpdater(cfg *Config) *SyzUpdater {
 		repoAddress:   cfg.SyzkallerRepo,
 		branch:        cfg.SyzkallerBranch,
 		descriptions:  cfg.SyzkallerDescriptions,
-		gopathDir:     gopath,
 		syzkallerDir:  syzkallerDir,
 		latestDir:     filepath.Join("syzkaller", "latest"),
 		currentDir:    filepath.Join("syzkaller", "current"),
@@ -227,14 +224,12 @@ func (upd *SyzUpdater) build(commit *vcs.Commit) error {
 		}
 		cmd := osutil.Command(instance.MakeBin, "generate")
 		cmd.Dir = upd.syzkallerDir
-		cmd.Env = append([]string{"GOPATH=" + upd.gopathDir}, os.Environ()...)
 		if _, err := osutil.Run(time.Hour, cmd); err != nil {
 			return osutil.PrependContext("generate failed", err)
 		}
 	}
 	cmd := osutil.Command(instance.MakeBin, "host", "ci")
 	cmd.Dir = upd.syzkallerDir
-	cmd.Env = append([]string{"GOPATH=" + upd.gopathDir}, os.Environ()...)
 	if _, err := osutil.Run(time.Hour, cmd); err != nil {
 		return osutil.PrependContext("make host failed", err)
 	}
@@ -244,7 +239,6 @@ func (upd *SyzUpdater) build(commit *vcs.Commit) error {
 		cmd.Dir = upd.syzkallerDir
 		cmd.Env = append([]string{}, os.Environ()...)
 		cmd.Env = append(cmd.Env,
-			"GOPATH="+upd.gopathDir,
 			"TARGETOS="+parts[0],
 			"TARGETVMARCH="+parts[1],
 			"TARGETARCH="+parts[2],
@@ -256,7 +250,6 @@ func (upd *SyzUpdater) build(commit *vcs.Commit) error {
 	cmd = osutil.Command("go", "test", "-short", "./...")
 	cmd.Dir = upd.syzkallerDir
 	cmd.Env = append([]string{
-		"GOPATH=" + upd.gopathDir,
 		"SYZ_DISABLE_SANDBOXING=yes",
 	}, os.Environ()...)
 	if _, err := osutil.Run(time.Hour, cmd); err != nil {

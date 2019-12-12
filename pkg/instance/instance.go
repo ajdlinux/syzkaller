@@ -13,7 +13,6 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
-	"strings"
 	"time"
 
 	"github.com/google/syzkaller/pkg/build"
@@ -62,10 +61,6 @@ func NewEnv(cfg *mgrconfig.Config) (Env, error) {
 
 func (env *env) BuildSyzkaller(repo, commit string) error {
 	cfg := env.cfg
-	srcIndex := strings.LastIndex(cfg.Syzkaller, "/src/")
-	if srcIndex == -1 {
-		return fmt.Errorf("syzkaller path %q is not in GOPATH", cfg.Syzkaller)
-	}
 	if _, err := vcs.NewSyzkallerRepo(cfg.Syzkaller).CheckoutCommit(repo, commit); err != nil {
 		return fmt.Errorf("failed to checkout syzkaller repo: %v", err)
 	}
@@ -73,7 +68,6 @@ func (env *env) BuildSyzkaller(repo, commit string) error {
 	cmd.Dir = cfg.Syzkaller
 	cmd.Env = append([]string{}, os.Environ()...)
 	cmd.Env = append(cmd.Env,
-		"GOPATH="+cfg.Syzkaller[:srcIndex],
 		"TARGETOS="+cfg.TargetOS,
 		"TARGETVMARCH="+cfg.TargetVMArch,
 		"TARGETARCH="+cfg.TargetArch,
