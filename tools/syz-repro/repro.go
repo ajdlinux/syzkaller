@@ -20,16 +20,28 @@ import (
 )
 
 var (
-	flagConfig = flag.String("config", "", "manager configuration file (manager.cfg)")
-	flagCount  = flag.Int("count", 0, "number of VMs to use (overrides config count param)")
-	flagDebug  = flag.Bool("debug", false, "print debug output")
+	flagConfig  = flag.String("config", "", "manager configuration file (manager.cfg)")
+	flagCount   = flag.Int("count", 0, "number of VMs to use (overrides config count param)")
+	flagDebug   = flag.Bool("debug", false, "print debug output")
+	flagVersion = flag.Bool("version", false, "print program version information")
 )
 
 func main() {
 	os.Args = append(append([]string{}, os.Args[0], "-vv=10"), os.Args[1:]...)
+
+	flag.Usage = func() {
+		fmt.Fprintf(os.Stderr, "Usage of %s:\n", os.Args[0])
+		fmt.Fprintf(os.Stderr, "  %s [options] -config=manager.cfg execution.log\n\n", os.Args[0])
+		flag.PrintDefaults()
+	}
 	flag.Parse()
+	if *flagVersion {
+		prog.PrintVersion()
+		os.Exit(0)
+	}
 	if len(flag.Args()) != 1 || *flagConfig == "" {
-		log.Fatalf("usage: syz-repro -config=manager.cfg execution.log")
+		flag.Usage()
+		os.Exit(1)
 	}
 	cfg, err := mgrconfig.LoadFile(*flagConfig)
 	if err != nil {

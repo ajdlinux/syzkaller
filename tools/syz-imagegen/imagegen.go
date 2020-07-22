@@ -463,8 +463,13 @@ func main() {
 		flagPopulate  = flag.String("populate", "", "populate the specified image with files (for internal use)")
 		flagKeepImage = flag.Bool("keep", false, "save disk images as .img files")
 		flagFS        = flag.String("fs", "", "generate images only for this single filesystem")
+		flagVersion   = flag.Bool("version", false, "print program version information")
 	)
 	flag.Parse()
+	if *flagVersion {
+		prog.PrintVersion()
+		os.Exit(0)
+	}
 	if *flagDebug {
 		*flagVerbose = true
 	}

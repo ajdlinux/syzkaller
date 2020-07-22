@@ -17,14 +17,19 @@ import (
 )
 
 var (
-	flagOS     = flag.String("os", runtime.GOOS, "target os")
-	flagArch   = flag.String("arch", runtime.GOARCH, "target arch")
-	flagEnable = flag.String("enable", "", "comma-separated list of enabled syscalls")
-	flagCorpus = flag.String("corpus", "", "name of the corpus file")
+	flagOS      = flag.String("os", runtime.GOOS, "target os")
+	flagArch    = flag.String("arch", runtime.GOARCH, "target arch")
+	flagEnable  = flag.String("enable", "", "comma-separated list of enabled syscalls")
+	flagCorpus  = flag.String("corpus", "", "name of the corpus file")
+	flagVersion = flag.Bool("version", false, "print program version information")
 )
 
 func main() {
 	flag.Parse()
+	if *flagVersion {
+		prog.PrintVersion()
+		os.Exit(0)
+	}
 	target, err := prog.GetTarget(*flagOS, *flagArch)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "%v", err)

@@ -12,6 +12,7 @@ import (
 
 	"github.com/google/syzkaller/dashboard/dashapi"
 	"github.com/google/syzkaller/pkg/kcidb"
+	"github.com/google/syzkaller/prog"
 )
 
 func main() {
@@ -26,12 +27,17 @@ func main() {
 		flagDashAddr   = flag.String("addr", "", "dashboard address")
 		flagDashKey    = flag.String("key", "", "dashboard API key")
 		flagBug        = flag.String("bug", "", "bug ID to upload to KCIDB")
+		flagVersion    = flag.Bool("version", false, "print program version information")
 	)
 	failf := func(msg string, args ...interface{}) {
 		fmt.Fprintf(os.Stderr, msg+"\n", args...)
 		os.Exit(1)
 	}
 	flag.Parse()
+	if *flagVersion {
+		prog.PrintVersion()
+		os.Exit(0)
+	}
 
 	dashboard := dashapi.New(*flagDashClient, *flagDashAddr, *flagDashKey)
 	bug, err := dashboard.LoadBug(*flagBug)

@@ -32,12 +32,14 @@ import (
 	"github.com/google/syzkaller/pkg/config"
 	"github.com/google/syzkaller/pkg/mgrconfig"
 	"github.com/google/syzkaller/pkg/osutil"
+	"github.com/google/syzkaller/prog"
 )
 
 var (
-	flagConfig = flag.String("config", "", "bisect config file")
-	flagCrash  = flag.String("crash", "", "dir with crash info")
-	flagFix    = flag.Bool("fix", false, "search for crash fix")
+	flagConfig  = flag.String("config", "", "bisect config file")
+	flagCrash   = flag.String("crash", "", "dir with crash info")
+	flagFix     = flag.Bool("fix", false, "search for crash fix")
+	flagVersion = flag.Bool("version", false, "print program version information")
 )
 
 type Config struct {
@@ -64,6 +66,10 @@ type Config struct {
 
 func main() {
 	flag.Parse()
+	if *flagVersion {
+		prog.PrintVersion()
+		os.Exit(0)
+	}
 	os.Setenv("SYZ_DISABLE_SANDBOXING", "yes")
 	mycfg := new(Config)
 	if err := config.LoadFile(*flagConfig, mycfg); err != nil {

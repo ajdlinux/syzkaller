@@ -35,6 +35,7 @@ import (
 	"github.com/google/syzkaller/pkg/mgrconfig"
 	"github.com/google/syzkaller/pkg/osutil"
 	"github.com/google/syzkaller/pkg/vcs"
+	"github.com/google/syzkaller/prog"
 )
 
 var (
@@ -48,6 +49,7 @@ var (
 	flagBisectBin     = flag.String("bisect_bin", "", "path to bisection binaries")
 	flagSyzkaller     = flag.String("syzkaller", ".", "path to built syzkaller")
 	flagSandbox       = flag.String("sandbox", "namespace", "sandbox to use for testing")
+	flagVersion       = flag.Bool("version", false, "print program version information")
 )
 
 const (
@@ -57,6 +59,10 @@ const (
 
 func main() {
 	flag.Parse()
+	if *flagVersion {
+		prog.PrintVersion()
+		os.Exit(0)
+	}
 	if os.Getuid() != 0 {
 		failf("image build will fail, run under root")
 	}

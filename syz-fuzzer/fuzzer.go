@@ -140,8 +140,15 @@ func main() {
 		flagPprof   = flag.String("pprof", "", "address to serve pprof profiles")
 		flagTest    = flag.Bool("test", false, "enable image testing mode")      // used by syz-ci
 		flagRunTest = flag.Bool("runtest", false, "enable program testing mode") // used by pkg/runtest
+		flagVersion = flag.Bool("version", false, "print program version information")
 	)
 	flag.Parse()
+
+	if *flagVersion {
+		prog.PrintVersion()
+		os.Exit(0)
+	}
+
 	outputType := parseOutputType(*flagOutput)
 	log.Logf(0, "fuzzer started")
 

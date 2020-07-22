@@ -16,6 +16,7 @@ import (
 	"github.com/google/syzkaller/pkg/osutil"
 	"github.com/google/syzkaller/pkg/report"
 	"github.com/google/syzkaller/pkg/vcs"
+	"github.com/google/syzkaller/prog"
 )
 
 var (
@@ -24,13 +25,24 @@ var (
 	flagKernelObj = flag.String("kernel_obj", ".", "path to kernel build/obj dir")
 	flagKernelSrc = flag.String("kernel_src", "", "path to kernel sources (defaults to kernel_obj)")
 	flagOutDir    = flag.String("outdir", "", "output directory")
+	flagVersion   = flag.Bool("version", false, "print program version information")
 )
 
 func main() {
-	flag.Parse()
-	if len(flag.Args()) != 1 {
-		fmt.Fprintf(os.Stderr, "usage: syz-symbolize [flags] kernel_log_file\n")
+	flag.Usage = func() {
+		fmt.Fprintf(os.Stderr, "Usage of %s:\n", os.Args[0])
+		fmt.Fprintf(os.Stderr, "  %s [options] kernel_log_file\n\n", os.Args[0])
 		flag.PrintDefaults()
+	}
+	flag.Parse()
+
+	if *flagVersion {
+		prog.PrintVersion()
+		os.Exit(0)
+	}
+
+	if len(flag.Args()) != 1 {
+		flag.Usage()
 		os.Exit(1)
 	}
 	cfg := &mgrconfig.Config{

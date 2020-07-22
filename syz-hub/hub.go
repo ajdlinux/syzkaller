@@ -6,17 +6,20 @@ package main
 import (
 	"flag"
 	"fmt"
+	"os"
 	"strings"
 	"sync"
 
 	"github.com/google/syzkaller/pkg/config"
 	"github.com/google/syzkaller/pkg/log"
 	"github.com/google/syzkaller/pkg/rpctype"
+	"github.com/google/syzkaller/prog"
 	"github.com/google/syzkaller/syz-hub/state"
 )
 
 var (
-	flagConfig = flag.String("config", "", "config file")
+	flagConfig  = flag.String("config", "", "config file")
+	flagVersion = flag.Bool("version", false, "print program version information")
 )
 
 type Config struct {
@@ -37,6 +40,12 @@ type Hub struct {
 
 func main() {
 	flag.Parse()
+
+	if *flagVersion {
+		prog.PrintVersion()
+		os.Exit(0)
+	}
+
 	cfg := new(Config)
 	if err := config.LoadFile(*flagConfig, cfg); err != nil {
 		log.Fatal(err)

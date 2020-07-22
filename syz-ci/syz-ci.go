@@ -67,6 +67,7 @@ import (
 	"github.com/google/syzkaller/pkg/log"
 	"github.com/google/syzkaller/pkg/mgrconfig"
 	"github.com/google/syzkaller/pkg/osutil"
+	"github.com/google/syzkaller/prog"
 )
 
 var (
@@ -74,6 +75,7 @@ var (
 	flagAutoUpdate = flag.Bool("autoupdate", true, "auto-update the binary (for testing)")
 	flagManagers   = flag.Bool("managers", true, "start managers (for testing)")
 	flagDebug      = flag.Bool("debug", false, "debug mode (for testing)")
+	flagVersion    = flag.Bool("version", false, "print program version information")
 )
 
 type Config struct {
@@ -132,6 +134,12 @@ type ManagerJobs struct {
 
 func main() {
 	flag.Parse()
+
+	if *flagVersion {
+		prog.PrintVersion()
+		os.Exit(0)
+	}
+
 	log.EnableLogCaching(1000, 1<<20)
 	cfg, err := loadConfig(*flagConfig)
 	if err != nil {

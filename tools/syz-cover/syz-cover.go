@@ -31,6 +31,7 @@ import (
 	"github.com/google/syzkaller/pkg/cmdprof"
 	"github.com/google/syzkaller/pkg/cover"
 	"github.com/google/syzkaller/pkg/osutil"
+	"github.com/google/syzkaller/prog"
 	"github.com/google/syzkaller/sys/targets"
 )
 
@@ -42,13 +43,22 @@ func main() {
 		flagKernelBuildSrc = flag.String("kernel_build_src", "", "path to kernel image's build dir (optional)")
 		flagKernelObj      = flag.String("kernel_obj", "", "path to kernel build/obj dir")
 		flagExport         = flag.String("csv", "", "export coverage data in csv format (optional)")
+		flagVersion        = flag.Bool("version", false, "print program version information")
 	)
+	flag.Usage = func() {
+		fmt.Fprintf(os.Stderr, "Usage of %s:\n", os.Args[0])
+		fmt.Fprintf(os.Stderr, "  %s [options] rawcover.file\n\n", os.Args[0])
+		flag.PrintDefaults()
+	}
 	flag.Parse()
+	if *flagVersion {
+		prog.PrintVersion()
+		os.Exit(0)
+	}
 	defer cmdprof.Install()()
 
 	if len(flag.Args()) == 0 {
-		fmt.Fprintf(os.Stderr, "usage: syz-cover [flags] rawcover.file\n")
-		flag.PrintDefaults()
+		flag.Usage()
 		os.Exit(1)
 	}
 	if *flagKernelSrc == "" {

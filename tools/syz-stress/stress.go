@@ -36,6 +36,7 @@ var (
 	flagSyscalls = flag.String("syscalls", "", "comma-separated list of enabled syscalls")
 	flagEnable   = flag.String("enable", "none", "enable only listed additional features")
 	flagDisable  = flag.String("disable", "none", "enable all additional features except listed")
+	flagVersion  = flag.Bool("version", false, "print program version information")
 
 	statExec uint64
 	gate     *ipc.Gate
@@ -47,6 +48,12 @@ func main() {
 		csource.PrintAvailableFeaturesFlags()
 	}
 	flag.Parse()
+
+	if *flagVersion {
+		prog.PrintVersion()
+		os.Exit(0)
+	}
+
 	featuresFlags, err := csource.ParseFeaturesFlags(*flagEnable, *flagDisable, true)
 	if err != nil {
 		log.Fatalf("%v", err)

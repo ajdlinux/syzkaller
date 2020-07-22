@@ -17,6 +17,7 @@ import (
 	"github.com/google/syzkaller/pkg/ast"
 	"github.com/google/syzkaller/pkg/compiler"
 	"github.com/google/syzkaller/pkg/osutil"
+	"github.com/google/syzkaller/prog"
 	"github.com/google/syzkaller/sys/targets"
 )
 
@@ -27,6 +28,7 @@ var (
 	flagIncludes  = flag.String("includedirs", "", "path to other kernel source include dirs separated by commas")
 	flagBuildDir  = flag.String("builddir", "", "path to kernel build dir")
 	flagArch      = flag.String("arch", "", "comma-separated list of arches to generate (all by default)")
+	flagVersion   = flag.Bool("version", false, "print program version information")
 )
 
 type Arch struct {
@@ -74,6 +76,10 @@ func main() {
 		os.Exit(1)
 	}
 	flag.Parse()
+	if *flagVersion {
+		prog.PrintVersion()
+		os.Exit(0)
+	}
 	if *flagBuild && *flagBuildDir != "" {
 		failf("-build and -builddir is an invalid combination")
 	}

@@ -27,10 +27,12 @@ import (
 	"github.com/google/syzkaller/pkg/html"
 	"github.com/google/syzkaller/pkg/mgrconfig"
 	"github.com/google/syzkaller/pkg/osutil"
+	"github.com/google/syzkaller/prog"
 )
 
 var (
-	flagConfig = flag.String("config", "", "configuration file")
+	flagConfig  = flag.String("config", "", "configuration file")
+	flagVersion = flag.Bool("version", false, "print program version information")
 )
 
 type UISummaryData struct {
@@ -55,6 +57,10 @@ type UICrash struct {
 
 func main() {
 	flag.Parse()
+	if *flagVersion {
+		prog.PrintVersion()
+		os.Exit(0)
+	}
 	cfg, err := mgrconfig.LoadFile(*flagConfig)
 	if err != nil {
 		log.Fatalf("%v", err)

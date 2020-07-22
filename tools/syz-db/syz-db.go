@@ -23,11 +23,16 @@ import (
 
 func main() {
 	var (
-		flagVersion = flag.Uint64("version", 0, "database version")
-		flagOS      = flag.String("os", "", "target OS")
-		flagArch    = flag.String("arch", "", "target arch")
+		flagDBVersion = flag.Uint64("dbversion", 0, "database version")
+		flagOS        = flag.String("os", "", "target OS")
+		flagArch      = flag.String("arch", "", "target arch")
+		flagVersion   = flag.Bool("version", false, "print program version information")
 	)
 	flag.Parse()
+	if *flagVersion {
+		prog.PrintVersion()
+		os.Exit(0)
+	}
 	args := flag.Args()
 	if len(args) == 0 {
 		usage()
@@ -56,7 +61,7 @@ func main() {
 	}
 	switch args[0] {
 	case "pack":
-		pack(args[1], args[2], target, *flagVersion)
+		pack(args[1], args[2], target, *flagDBVersion)
 	case "unpack":
 		unpack(args[1], args[2])
 	default:

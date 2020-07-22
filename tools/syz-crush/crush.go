@@ -33,6 +33,7 @@ var (
 	flagDebug       = flag.Bool("debug", false, "dump all VM output to console")
 	flagRestartTime = flag.Duration("restart_time", time.Hour, "how long to run the test")
 	flagInfinite    = flag.Bool("infinite", true, "by default test is run for ever, -infinite=false to stop on crash")
+	flagVersion     = flag.Bool("version", false, "print program version information")
 )
 
 type FileType int
@@ -43,10 +44,18 @@ const (
 )
 
 func main() {
-	flag.Parse()
-	if len(flag.Args()) != 1 || *flagConfig == "" {
-		fmt.Fprintf(os.Stderr, "usage: syz-crush [flags] <execution.log|creprog.c>\n")
+	flag.Usage = func() {
+		fmt.Fprintf(os.Stderr, "Usage of %s:\n", os.Args[0])
+		fmt.Fprintf(os.Stderr, "  %s [options] <execution.log|creprog.c>\n\n", os.Args[0])
 		flag.PrintDefaults()
+	}
+	flag.Parse()
+	if *flagVersion {
+		prog.PrintVersion()
+		os.Exit(0)
+	}
+	if len(flag.Args()) != 1 || *flagConfig == "" {
+		flag.Usage()
 		os.Exit(1)
 	}
 	cfg, err := mgrconfig.LoadFile(*flagConfig)

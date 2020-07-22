@@ -14,6 +14,7 @@ package main
 import (
 	"flag"
 	"io/ioutil"
+	"os"
 	"path/filepath"
 	"strconv"
 
@@ -29,6 +30,7 @@ var (
 	flagFile        = flag.String("file", "", "file to parse")
 	flagDir         = flag.String("dir", "", "directory to parse")
 	flagDeserialize = flag.String("deserialize", "", "(Optional) directory to store deserialized programs")
+	flagVersion     = flag.Bool("version", false, "print program version information")
 )
 
 const (
@@ -38,6 +40,10 @@ const (
 
 func main() {
 	flag.Parse()
+	if *flagVersion {
+		prog.PrintVersion()
+		os.Exit(0)
+	}
 	target := initializeTarget(goos, arch)
 	progs := parseTraces(target)
 	log.Logf(0, "successfully converted traces; generating corpus.db")

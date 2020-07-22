@@ -38,6 +38,7 @@ var (
 	flagFaultNth  = flag.Int("fault_nth", 0, "inject fault on n-th operation (0-based)")
 	flagEnable    = flag.String("enable", "none", "enable only listed additional features")
 	flagDisable   = flag.String("disable", "none", "enable all additional features except listed")
+	flagVersion   = flag.Bool("version", false, "print program version information")
 )
 
 func main() {
@@ -47,6 +48,10 @@ func main() {
 		csource.PrintAvailableFeaturesFlags()
 	}
 	flag.Parse()
+	if *flagVersion {
+		prog.PrintVersion()
+		os.Exit(0)
+	}
 	if len(flag.Args()) == 0 {
 		flag.Usage()
 		os.Exit(1)

@@ -20,10 +20,12 @@ import (
 	"sort"
 
 	"github.com/google/syzkaller/pkg/osutil"
+	"github.com/google/syzkaller/prog"
 )
 
 var (
-	flagSkip = flag.Int("skip", -30, "skip that many seconds after start (skip first 20% by default)")
+	flagSkip    = flag.Int("skip", -30, "skip that many seconds after start (skip first 20% by default)")
+	flagVersion = flag.Bool("version", false, "print program version information")
 )
 
 type Graph struct {
@@ -38,10 +40,18 @@ type Point struct {
 }
 
 func main() {
-	flag.Parse()
-	if len(flag.Args()) == 0 {
-		fmt.Fprintf(os.Stderr, "usage: syz-benchcmp [flags] bench_file0 [bench_file1 [bench_file2]]...\n")
+	flag.Usage = func() {
+		fmt.Fprintf(os.Stderr, "Usage of %s:\n", os.Args[0])
+		fmt.Fprintf(os.Stderr, "  %s [options] bench_file0 [bench_file1 [bench_file2...]]\n\n", os.Args[0])
 		flag.PrintDefaults()
+	}
+	flag.Parse()
+	if *flagVersion {
+		prog.PrintVersion()
+		os.Exit(0)
+	}
+	if len(flag.Args()) == 0 {
+		flag.Usage()
 		os.Exit(1)
 	}
 

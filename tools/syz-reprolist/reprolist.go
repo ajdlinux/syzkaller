@@ -19,6 +19,7 @@ import (
 	"github.com/google/syzkaller/pkg/csource"
 	"github.com/google/syzkaller/pkg/osutil"
 	"github.com/google/syzkaller/pkg/vcs"
+	"github.com/google/syzkaller/prog"
 )
 
 var (
@@ -28,10 +29,15 @@ var (
 	flagOutputDir    = flag.String("output", "repros", "output dir")
 	flagSyzkallerDir = flag.String("syzkaller", ".", "syzkaller dir")
 	flagOS           = flag.String("os", runtime.GOOS, "target OS")
+	flagVersion      = flag.Bool("version", false, "print program version information")
 )
 
 func main() {
 	flag.Parse()
+	if *flagVersion {
+		prog.PrintVersion()
+		os.Exit(0)
+	}
 	if *flagAPIClient == "" || *flagAPIKey == "" {
 		log.Fatalf("api client and key are required")
 	}

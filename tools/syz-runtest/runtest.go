@@ -31,13 +31,18 @@ import (
 )
 
 var (
-	flagConfig = flag.String("config", "", "manager config")
-	flagDebug  = flag.Bool("debug", false, "debug mode")
-	flagTests  = flag.String("tests", "", "prefix to match test file names")
+	flagConfig  = flag.String("config", "", "manager config")
+	flagDebug   = flag.Bool("debug", false, "debug mode")
+	flagTests   = flag.String("tests", "", "prefix to match test file names")
+	flagVersion = flag.Bool("version", false, "print program version information")
 )
 
 func main() {
 	flag.Parse()
+	if *flagVersion {
+		prog.PrintVersion()
+		os.Exit(0)
+	}
 	cfg, err := mgrconfig.LoadFile(*flagConfig)
 	if err != nil {
 		log.Fatal(err)

@@ -8,6 +8,7 @@ import (
 	"flag"
 	"io/ioutil"
 	"log"
+	"os"
 	"path/filepath"
 	"runtime"
 
@@ -29,8 +30,13 @@ func main() {
 		flagCorpus     = flag.String("corpus", "", "coprpus file to upload")
 		flagWorkdir    = flag.String("workdir", "", "workdir to upload coprpus and reproducers")
 		flagDrain      = flag.Bool("drain", false, "drain hub corpus and reproducers for the given manager")
+		flagVersion    = flag.Bool("version", false, "print program version information")
 	)
 	flag.Parse()
+	if *flagVersion {
+		prog.PrintVersion()
+		os.Exit(0)
+	}
 	target, err := prog.GetTarget(*flagOS, *flagArch)
 	if err != nil {
 		log.Fatal(err)

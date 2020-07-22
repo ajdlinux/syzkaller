@@ -17,14 +17,19 @@ import (
 )
 
 var (
-	flagOS     = flag.String("os", runtime.GOOS, "target os")
-	flagArch   = flag.String("arch", runtime.GOARCH, "target arch")
-	flagProg   = flag.String("prog", "", "file with program to expand")
-	flagStrict = flag.Bool("strict", false, "parse input program in strict mode")
+	flagOS      = flag.String("os", runtime.GOOS, "target os")
+	flagArch    = flag.String("arch", runtime.GOARCH, "target arch")
+	flagProg    = flag.String("prog", "", "file with program to expand")
+	flagStrict  = flag.Bool("strict", false, "parse input program in strict mode")
+	flagVersion = flag.Bool("version", false, "print program version information")
 )
 
 func main() {
 	flag.Parse()
+	if *flagVersion {
+		prog.PrintVersion()
+		os.Exit(0)
+	}
 	if *flagProg == "" {
 		flag.Usage()
 		os.Exit(1)

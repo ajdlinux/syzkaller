@@ -56,11 +56,18 @@ type ExecutorData struct {
 	CallAttrs []string
 }
 
-var srcDir = flag.String("src", "", "path to root of syzkaller source dir")
-var outDir = flag.String("out", "", "path to out dir")
+var (
+	srcDir      = flag.String("src", "", "path to root of syzkaller source dir")
+	outDir      = flag.String("out", "", "path to out dir")
+	flagVersion = flag.Bool("version", false, "print program version information")
+)
 
 func main() {
 	flag.Parse()
+	if *flagVersion {
+		prog.PrintVersion()
+		os.Exit(0)
+	}
 	defer cmdprof.Install()()
 
 	var OSList []string

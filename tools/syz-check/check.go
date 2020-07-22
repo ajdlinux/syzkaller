@@ -50,6 +50,7 @@ func main() {
 		flagOS      = flag.String("os", runtime.GOOS, "OS")
 		flagDWARF   = flag.Bool("dwarf", true, "do checking based on DWARF")
 		flagNetlink = flag.Bool("netlink", true, "do checking of netlink policies")
+		flagVersion = flag.Bool("version", false, "print program version information")
 	)
 	arches := make(map[string]*string)
 	for arch := range targets.List["linux"] {
@@ -60,6 +61,12 @@ func main() {
 		os.Exit(1)
 	}
 	flag.Parse()
+
+	if *flagVersion {
+		prog.PrintVersion()
+		os.Exit(0)
+	}
+
 	defer cmdprof.Install()()
 	var warnings []Warn
 	for arch, obj := range arches {

@@ -13,13 +13,28 @@ import (
 	"sort"
 
 	"github.com/google/syzkaller/pkg/osutil"
+	"github.com/google/syzkaller/prog"
 )
 
+var flagVersion = flag.Bool("version", false, "print program version information")
+
 func main() {
+	flag.Usage = func() {
+		fmt.Fprintf(os.Stderr, "Usage of %s:\n", os.Args[0])
+		fmt.Fprintf(os.Stderr, "  %s [options] syslog.txt sys/linux/init_vusb_ids.go\n\n", os.Args[0])
+		flag.PrintDefaults()
+	}
 	flag.Parse()
+
+	if *flagVersion {
+		prog.PrintVersion()
+		os.Exit(0)
+	}
+
 	args := flag.Args()
 	if len(args) != 2 {
-		usage()
+		flag.Usage()
+		os.Exit(1)
 	}
 
 	syslog, err := ioutil.ReadFile(args[0])
@@ -85,12 +100,6 @@ func generateIdsVar(ids []string, name string) []byte {
 	fmt.Printf("%v %s ids written\n", len(ids), name)
 
 	return output
-}
-
-func usage() {
-	fmt.Fprintf(os.Stderr, "usage:\n")
-	fmt.Fprintf(os.Stderr, "  syz-usbgen syslog.txt sys/linux/init_vusb_ids.go\n")
-	os.Exit(1)
 }
 
 func failf(msg string, args ...interface{}) {

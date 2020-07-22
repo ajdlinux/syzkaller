@@ -39,9 +39,10 @@ import (
 )
 
 var (
-	flagConfig = flag.String("config", "", "configuration file")
-	flagDebug  = flag.Bool("debug", false, "dump all VM output to console")
-	flagBench  = flag.String("bench", "", "write execution statistics into this file periodically")
+	flagConfig  = flag.String("config", "", "configuration file")
+	flagDebug   = flag.Bool("debug", false, "dump all VM output to console")
+	flagBench   = flag.String("bench", "", "write execution statistics into this file periodically")
+	flagVersion = flag.Bool("version", false, "print program version information")
 )
 
 type Manager struct {
@@ -119,6 +120,12 @@ func main() {
 		log.Fatalf("bad syz-manager build: build with make, run bin/syz-manager")
 	}
 	flag.Parse()
+
+	if *flagVersion {
+		prog.PrintVersion()
+		os.Exit(0)
+	}
+
 	log.EnableLogCaching(1000, 1<<20)
 	cfg, err := mgrconfig.LoadFile(*flagConfig)
 	if err != nil {

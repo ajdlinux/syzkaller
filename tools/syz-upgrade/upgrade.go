@@ -11,6 +11,7 @@ import (
 	"bytes"
 	"crypto/sha1"
 	"encoding/hex"
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -22,11 +23,25 @@ import (
 	_ "github.com/google/syzkaller/sys"
 )
 
+var flagVersion = flag.Bool("version", false, "print program version information")
+
 func main() {
-	if len(os.Args) != 2 {
-		fatalf("usage: syz-upgrade corpus_dir")
+	flag.Usage = func() {
+		fmt.Fprintf(os.Stderr, "Usage of %s:\n", os.Args[0])
+		fmt.Fprintf(os.Stderr, "  %s [options] corpus_dir\n\n", os.Args[0])
+		flag.PrintDefaults()
 	}
-	files, err := ioutil.ReadDir(os.Args[1])
+	flag.Parse()
+	if *flagVersion {
+		prog.PrintVersion()
+		os.Exit(0)
+	}
+	args := flag.Args()
+	if len(args) != 2 {
+		flag.Usage()
+		os.Exit(1)
+	}
+	files, err := ioutil.ReadDir(args[1])
 	if err != nil {
 		fatalf("failed to read corpus dir: %v", err)
 	}
@@ -35,7 +50,7 @@ func main() {
 		fatalf("%v", err)
 	}
 	for _, f := range files {
-		fname := filepath.Join(os.Args[1], f.Name())
+		fname := filepath.Join(args[1], f.Name())
 		data, err := ioutil.ReadFile(fname)
 		if err != nil {
 			fatalf("failed to read program: %v", err)
@@ -50,7 +65,7 @@ func main() {
 		}
 		fmt.Printf("upgrading:\n%s\nto:\n%s\n\n", data, data1)
 		hash := sha1.Sum(data1)
-		fname1 := filepath.Join(os.Args[1], hex.EncodeToString(hash[:]))
+		fname1 := filepath.Join(args[1], hex.EncodeToString(hash[:]))
 		if err := osutil.WriteFile(fname1, data1); err != nil {
 			fatalf("failed to write program: %v", err)
 		}
