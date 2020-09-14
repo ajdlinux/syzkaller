@@ -535,7 +535,7 @@ func (jp *JobProcessor) testPatch(job *Job, mgrcfg *mgrconfig.Config) error {
 
 	log.Logf(0, "job: building kernel...")
 	kernelConfig, _, err := env.BuildKernel(mgr.mgrcfg.Compiler, mgr.mgrcfg.Ccache, mgr.mgrcfg.Userspace,
-		mgr.mgrcfg.KernelCmdline, mgr.mgrcfg.KernelSysctl, req.KernelConfig)
+		mgr.mgrcfg.KernelCmdline, mgr.mgrcfg.KernelSysctl, req.KernelConfig, mgr.mgrcfg.RootfsPath, mgr.mgrcfg.KeyPath)
 	if err != nil {
 		return err
 	}

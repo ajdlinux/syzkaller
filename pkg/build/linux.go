@@ -21,11 +21,23 @@ import (
 	"github.com/google/syzkaller/sys/targets"
 )
 
+// Builder that requires a root filesystem image and key file. Doesn't install
+// a bootloader.
 type linux struct{}
+
+// Builder using create-gce-image.sh script to create an image with a
+// bootloader installed.
+type linux_gce struct{}
 
 var _ signer = linux{}
 
 func (linux linux) build(params *Params) error {
+	if params.RootfsPath == "" {
+		return fmt.Errorf("No rootfs path supplied")
+	}
+	if params.KeyPath == "" {
+		return fmt.Errorf("No key path supplied")
+	}
 	if err := linux.buildKernel(params); err != nil {
 		return err
 	}
@@ -99,44 +111,26 @@ func (linux linux) buildKernel(params *Params) error {
 }
 
 func (linux) createImage(params *Params) error {
-	tempDir, err := ioutil.TempDir("", "syz-build")
-	if err != nil {
-		return err
-	}
-	defer os.RemoveAll(tempDir)
-	scriptFile := filepath.Join(tempDir, "create.sh")
-	if err := osutil.WriteExecFile(scriptFile, []byte(createImageScript)); err != nil {
-		return fmt.Errorf("failed to write script file: %v", err)
-	}
-
 	var kernelImage string
 	switch params.TargetArch {
-	case targets.I386, targets.AMD64:
+	case "386", "amd64":
 		kernelImage = "arch/x86/boot/bzImage"
-	case targets.PPC64LE:
+	case "ppc64le":
 		kernelImage = "arch/powerpc/boot/zImage.pseries"
-	case targets.S390x:
+	case "s390x":
 		kernelImage = "arch/s390/boot/bzImage"
 	}
 	kernelImagePath := filepath.Join(params.KernelDir, filepath.FromSlash(kernelImage))
-	cmd := osutil.Command(scriptFile, params.UserspaceDir, kernelImagePath, params.TargetArch)
-	cmd.Dir = tempDir
-	cmd.Env = append([]string{}, os.Environ()...)
-	cmd.Env = append(cmd.Env,
-		"SYZ_VM_TYPE="+params.VMType,
-		"SYZ_CMDLINE_FILE="+osutil.Abs(params.CmdlineFile),
-		"SYZ_SYSCTL_FILE="+osutil.Abs(params.SysctlFile),
-	)
-	if _, err = osutil.Run(time.Hour, cmd); err != nil {
-		return fmt.Errorf("image build failed: %v", err)
-	}
-	// Note: we use CopyFile instead of Rename because src and dst can be on different filesystems.
 	imageFile := filepath.Join(params.OutputDir, "image")
-	if err := osutil.CopyFile(filepath.Join(tempDir, "disk.raw"), imageFile); err != nil {
+	keyFile := filepath.Join(params.OutputDir, "key")
+	kernelFile := filepath.Join(params.OutputDir, "kernel")
+	if err := osutil.CopyFile(kernelImagePath, kernelFile); err != nil {
 		return err
 	}
-	keyFile := filepath.Join(params.OutputDir, "key")
-	if err := osutil.CopyFile(filepath.Join(tempDir, "key"), keyFile); err != nil {
+	if err := osutil.CopyFile(params.RootfsPath, imageFile); err != nil {
+		return err
+	}
+	if err := osutil.CopyFile(params.KeyPath, keyFile); err != nil {
 		return err
 	}
 	if err := os.Chmod(keyFile, 0600); err != nil {
@@ -154,6 +148,69 @@ func (linux) writeFile(file string, data []byte) error {
 		return err
 	}
 	return osutil.SandboxChown(file)
+}
+
+func (linux_gce linux_gce) build(params *Params) error {
+	if err := linux.buildKernel(linux{}, params); err != nil {
+		return err
+	}
+	if err := linux_gce.createImage(params); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (linux_gce) createImage(params *Params) error {
+	var kernelImage string
+	switch params.TargetArch {
+	case targets.I386, targets.AMD64:
+		kernelImage = "arch/x86/boot/bzImage"
+	case targets.PPC64LE:
+		kernelImage = "arch/powerpc/boot/zImage.pseries"
+	case targets.S390x:
+		kernelImage = "arch/s390/boot/bzImage"
+	}
+	kernelImagePath := filepath.Join(params.KernelDir, filepath.FromSlash(kernelImage))
+	imageFile := filepath.Join(params.OutputDir, "image")
+	keyFile := filepath.Join(params.OutputDir, "key")
+
+	tempDir, err := ioutil.TempDir("", "syz-build")
+	if err != nil {
+		return err
+	}
+	defer os.RemoveAll(tempDir)
+
+	scriptFile := filepath.Join(tempDir, "create.sh")
+	if err := osutil.WriteExecFile(scriptFile, []byte(createImageScript)); err != nil {
+		return fmt.Errorf("failed to write script file: %v", err)
+	}
+
+	cmd := osutil.Command(scriptFile, params.UserspaceDir, kernelImagePath, params.TargetArch)
+	cmd.Dir = tempDir
+	cmd.Env = append([]string{}, os.Environ()...)
+	cmd.Env = append(cmd.Env,
+		"SYZ_VM_TYPE="+params.VMType,
+		"SYZ_CMDLINE_FILE="+osutil.Abs(params.CmdlineFile),
+		"SYZ_SYSCTL_FILE="+osutil.Abs(params.SysctlFile),
+	)
+	if _, err = osutil.Run(time.Hour, cmd); err != nil {
+		return fmt.Errorf("image build failed: %v", err)
+	}
+	// Note: we use CopyFile instead of Rename because src and dst can be on different filesystems.
+	if err := osutil.CopyFile(filepath.Join(tempDir, "disk.raw"), imageFile); err != nil {
+		return err
+	}
+	if err := osutil.CopyFile(filepath.Join(tempDir, "key"), keyFile); err != nil {
+		return err
+	}
+	if err := os.Chmod(keyFile, 0600); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (linux_gce) clean(kernelDir, targetArch string) error {
+	return linux.clean(linux{}, kernelDir, targetArch)
 }
 
 func runMake(kernelDir string, args ...string) error {

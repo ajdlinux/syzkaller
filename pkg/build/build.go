@@ -32,6 +32,8 @@ type Params struct {
 	CmdlineFile  string
 	SysctlFile   string
 	Config       []byte
+	RootfsPath   string // optional: needed if you're kernel injecting
+	KeyPath      string // optional: needed if you're kernel injecting
 }
 
 // Image creates a disk image for the specified OS/ARCH/VM.
@@ -120,9 +122,9 @@ func getBuilder(targetOS, targetArch, vmType string) (builder, error) {
 		b    builder
 	}{
 		{targets.Linux, targets.AMD64, []string{"gvisor"}, gvisor{}},
-		{targets.Linux, targets.AMD64, []string{"gce", "qemu"}, linux{}},
+		{targets.Linux, targets.AMD64, []string{"gce", "qemu"}, linux_gce{}},
 		{targets.Linux, targets.PPC64LE, []string{"qemu"}, linux{}},
-		{targets.Linux, targets.S390x, []string{"qemu"}, linux{}},
+		{targets.Linux, targets.S390x, []string{"qemu"}, linux_gce{}},
 		{targets.Fuchsia, targets.AMD64, []string{"qemu"}, fuchsia{}},
 		{targets.Fuchsia, targets.ARM64, []string{"qemu"}, fuchsia{}},
 		{targets.Akaros, targets.AMD64, []string{"qemu"}, akaros{}},

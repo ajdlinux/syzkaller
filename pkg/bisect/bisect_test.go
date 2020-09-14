@@ -34,7 +34,7 @@ func (env *testEnv) BuildSyzkaller(repo, commit string) error {
 }
 
 func (env *testEnv) BuildKernel(compilerBin, cCache, userspaceDir, cmdlineFile, sysctlFile string,
-	kernelConfig []byte) (string, string, error) {
+	kernelConfig []byte, rootfsPath string, keyPath string) (string, string, error) {
 	commit := env.headCommit()
 	configHash := hash.String(kernelConfig)
 	kernelSign := fmt.Sprintf("%v-%v", commit, configHash)

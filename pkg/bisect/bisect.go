@@ -47,6 +47,8 @@ type KernelConfig struct {
 	// this minimized one.
 	BaselineConfig []byte
 	Userspace      string
+	RootfsPath     string // optional: needed if you're kernel injecting
+	KeyPath        string // optional: needed if you're kernel injecting
 }
 
 type SyzkallerConfig struct {
@@ -428,7 +430,7 @@ func (env *env) build() (*vcs.Commit, string, error) {
 	}
 	kern := &env.cfg.Kernel
 	_, kernelSign, err := env.inst.BuildKernel(bisectEnv.Compiler, env.cfg.Ccache, kern.Userspace,
-		kern.Cmdline, kern.Sysctl, bisectEnv.KernelConfig)
+		kern.Cmdline, kern.Sysctl, bisectEnv.KernelConfig, kern.RootfsPath, kern.KeyPath)
 	if kernelSign != "" {
 		env.log("kernel signature: %v", kernelSign)
 	}

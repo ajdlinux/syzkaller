@@ -124,6 +124,9 @@ type ManagerConfig struct {
 	KernelSysctl string      `json:"kernel_sysctl"`
 	Jobs         ManagerJobs `json:"jobs"`
 
+	RootfsPath string `json:"rootfs_path"`
+	KeyPath    string `json:"key_path"`
+
 	ManagerConfig json.RawMessage `json:"manager_config"`
 	managercfg    *mgrconfig.Config
 }

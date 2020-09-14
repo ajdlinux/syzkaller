@@ -312,6 +312,8 @@ func (mgr *Manager) build(kernelCommit *vcs.Commit) error {
 		CmdlineFile:  mgr.mgrcfg.KernelCmdline,
 		SysctlFile:   mgr.mgrcfg.KernelSysctl,
 		Config:       mgr.configData,
+		RootfsPath:   mgr.mgrcfg.RootfsPath,
+		KeyPath:      mgr.mgrcfg.KeyPath,
 	}
 	if _, err := build.Image(params); err != nil {
 		rep := &report.Report{

@@ -48,6 +48,8 @@ var (
 	flagBisectBin     = flag.String("bisect_bin", "", "path to bisection binaries")
 	flagSyzkaller     = flag.String("syzkaller", ".", "path to built syzkaller")
 	flagSandbox       = flag.String("sandbox", "namespace", "sandbox to use for testing")
+	flagRootfsPath    = flag.String("rootfs_path", "", "path to root filesystem image (optional)")
+	flagKeyPath       = flag.String("key_path", "", "path to root filesystem's SSH private key (optional)")
 )
 
 const (
@@ -129,7 +131,7 @@ func test(repo vcs.Repo, bisecter vcs.Bisecter, kernelConfig []byte, env instanc
 		fail(err)
 	}
 	_, _, err = env.BuildKernel(bisectEnv.Compiler, "", *flagUserspace,
-		*flagKernelCmdline, *flagKernelSysctl, bisectEnv.KernelConfig)
+		*flagKernelCmdline, *flagKernelSysctl, bisectEnv.KernelConfig, *flagRootfsPath, *flagKeyPath)
 	if err != nil {
 		if verr, ok := err.(*osutil.VerboseError); ok {
 			log.Printf("BUILD BROKEN: %v", verr.Title)
