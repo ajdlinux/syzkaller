@@ -161,10 +161,13 @@ var archConfigs = map[string]*archConfig{
 		),
 	},
 	"linux/ppc64le": {
-		Qemu:     "qemu-system-ppc64",
-		QemuArgs: "-enable-kvm -vga none",
-		NetDev:   "virtio-net-pci",
-		CmdLine:  linuxCmdline,
+		Qemu:      "qemu-system-ppc64",
+		QemuArgs:  "-enable-kvm -vga none",
+		NetDev:    "virtio-net-pci",
+		CmdLine: append(linuxCmdline,
+			"root=/dev/sda",
+			"console=ttyS0",
+		),
 	},
 	"linux/riscv64": {
 		Qemu:                   "qemu-system-riscv64",
