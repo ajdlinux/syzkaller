@@ -82,7 +82,7 @@ Install debootstrap:
 sudo apt-get install debootstrap
 ```
 
-To create a Debian Stretch Linux image with the minimal set of required packages do:
+To create a Debian Buster Linux image with the minimal set of required packages do:
 
 ```
 cd $IMAGE/
@@ -91,12 +91,12 @@ chmod +x create-image.sh
 ./create-image.sh
 ```
 
-The result should be `$IMAGE/stretch.img` disk image.
+The result should be `$IMAGE/buster.img` disk image.
 
-If you would like to generate an image with Debian Wheezy, instead of Stretch, do:
+If you would like to generate an image with Debian Stretch, instead of Buster, do:
 
 ``` bash
-./create-image.sh --distribution wheezy
+./create-image.sh --distribution stretch
 ```
 
 Sometimes it's useful to have some additional packages and tools available in the VM even though they are not required to run syzkaller. To install a set of tools we find useful do (feel free to edit the list of tools in the script):
