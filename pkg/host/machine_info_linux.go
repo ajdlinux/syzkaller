@@ -9,15 +9,27 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 )
 
 func init() {
 	machineInfoFuncs = []machineInfoFunc{
+		{"Kernel Info", readKernelInfo},
 		{"CPU Info", readCPUInfo},
 		{"KVM", readKVMInfo},
 	}
+}
+
+func readKernelInfo(buffer *bytes.Buffer) error {
+	cmd := exec.Command("uname", "-a")
+	cmd.Stdout = buffer
+	err := cmd.Run()
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func readCPUInfo(buffer *bytes.Buffer) error {

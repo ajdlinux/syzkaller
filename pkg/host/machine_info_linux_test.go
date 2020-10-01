@@ -21,6 +21,9 @@ func TestMachineInfoLinux(t *testing.T) {
 	for scanner.Scan() {
 		line := scanner.Text()
 
+		if line == "[Kernel Info]" {
+			checkKernelInfo(t, scanner)
+		}
 		if line == "[CPU Info]" {
 			checkCPUInfo(t, scanner)
 		}
@@ -28,6 +31,21 @@ func TestMachineInfoLinux(t *testing.T) {
 			checkKVMInfo(t, scanner)
 		}
 	}
+}
+
+func checkKernelInfo(t *testing.T, scanner *bufio.Scanner) string {
+	// Expect one line of text, starting with the word "Linux"
+	scanner.Scan()
+	kernelLine := scanner.Text()
+	if !strings.HasPrefix(kernelLine, "Linux") {
+		t.Fatalf("the format of line \"%s\" is not correct", kernelLine)
+	}
+	scanner.Scan()
+	breakLine := scanner.Text()
+	if !strings.HasPrefix(breakLine, "-----") {
+		t.Fatalf("unexpected line \"%s\"", breakLine)
+	}
+	return kernelLine
 }
 
 func checkCPUInfo(t *testing.T, scanner *bufio.Scanner) {
