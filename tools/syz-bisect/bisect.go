@@ -60,6 +60,9 @@ type Config struct {
 	Cmdline string `json:"cmdline"`
 	// Manager config that was used to obtain the crash.
 	Manager json.RawMessage `json:"manager"`
+	// Paths to root filesystem image and SSH private key (optional)
+	RootfsPath string `json:"rootfs_path"`
+	KeyPath    string `json:"key_path"`
 }
 
 func main() {
@@ -90,11 +93,13 @@ func main() {
 		Ccache:   mycfg.Ccache,
 		DebugDir: *flagCrash,
 		Kernel: bisect.KernelConfig{
-			Repo:      mycfg.KernelRepo,
-			Branch:    mycfg.KernelBranch,
-			Userspace: mycfg.Userspace,
-			Sysctl:    mycfg.Sysctl,
-			Cmdline:   mycfg.Cmdline,
+			Repo:       mycfg.KernelRepo,
+			Branch:     mycfg.KernelBranch,
+			Userspace:  mycfg.Userspace,
+			Sysctl:     mycfg.Sysctl,
+			Cmdline:    mycfg.Cmdline,
+			RootfsPath: mycfg.RootfsPath,
+			KeyPath:    mycfg.KeyPath,
 		},
 		Syzkaller: bisect.SyzkallerConfig{
 			Repo: mycfg.SyzkallerRepo,
