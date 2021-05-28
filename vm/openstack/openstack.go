@@ -23,6 +23,22 @@ import (
         "github.com/google/syzkaller/vm/vmimpl"
 )
 
+/*
+
+What does the configuration look like?
+
+How do we talk to Nova?
+
+How do we establish an SSH link?
+
+How do we establish a console link?
+
+How do we set up port forwarding??? (GCE assumes you're on the same internal network, Qemu seems to use SSH port forwarding)
+
+How do we get debugging information?
+
+*/
+
 func init() {
         vmimpl.Register("openstack", ctor, false) // TODO: overcommit?
 }
