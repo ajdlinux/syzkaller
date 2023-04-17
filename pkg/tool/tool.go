@@ -21,7 +21,7 @@ import (
 func Init() func() {
 	flagCPUProfile := flag.String("cpuprofile", "", "write CPU profile to this file")
 	flagMEMProfile := flag.String("memprofile", "", "write memory profile to this file")
-	flagVersion := flag.Bool("version", false, "print program version information")
+	flagVersion := flag.Bool("gitversion", false, "print program version information")
 	if err := ParseFlags(flag.CommandLine, os.Args[1:]); err != nil {
 		Fail(err)
 	}
