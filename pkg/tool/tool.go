@@ -8,6 +8,8 @@ import (
 	"flag"
 	"fmt"
 	"os"
+
+	"github.com/google/syzkaller/prog"
 )
 
 // Init handles common tasks for command line tools:
@@ -24,7 +26,7 @@ func Init() func() {
 		Fail(err)
 	}
 	if *flagVersion {
-		//prog.PrintVersion()
+		prog.PrintVersion()
 		os.Exit(0)
 	}
 	return installProfiling(*flagCPUProfile, *flagMEMProfile)

@@ -4,6 +4,7 @@
 package prog
 
 import (
+	"fmt"
 	"strings"
 	"time"
 )
@@ -23,4 +24,9 @@ func init() {
 			panic(err)
 		}
 	}
+}
+
+func PrintVersion() {
+	fmt.Printf("syzkaller git revision: %s, date: %s\n",
+		GitRevision, gitRevisionDate)
 }
